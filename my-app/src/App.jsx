@@ -5,6 +5,7 @@ import heroImg from './assets/hero.png'
 import './App.css'
 import { Routes, Route } from 'react-router-dom'
 import Inicio from "./pages/Inicio"
+import StockManager from "./pages/StockManager"
 
 function App() {
 
@@ -13,6 +14,7 @@ function App() {
     <>
       <Routes>
         <Route path='/' element={<Inicio />}></Route>
+        <Route path='/StockManager' element={<StockManager />}></Route>
       </Routes>
     </>
   )
