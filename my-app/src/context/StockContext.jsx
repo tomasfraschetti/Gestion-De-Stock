@@ -7,7 +7,7 @@ export const StockContext = createContext();
 
 // Creamos el "Proveedor" que va a envolver a toda la App
 export const StockProvider = ({ children }) => {
-    // Acá nacen tus dos listas vacías
+    // listas vacías
     const [viandasDisponibles, setviandasDisponibles] = useState([]);
     const [pedidos, setPedidos] = useState([]);
 
