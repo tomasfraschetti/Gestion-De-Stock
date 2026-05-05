@@ -3,7 +3,7 @@ import { StockContext } from "../context/StockContext";
 import { useNavigate } from "react-router-dom";
 
 function ContadorVentas() {
-    const { pedidos } = useContext(StockContext);
+    const { pedidos, setPedidos } = useContext(StockContext);
     const navigate = useNavigate();
 
     // Separamos pedidos
@@ -24,6 +24,63 @@ function ContadorVentas() {
 
     const sumaEntregados = Object.values(totalesEntregados).reduce((a, b) => a + b, 0);
     const sumaPendientes = Object.values(totalesPendientes).reduce((a, b) => a + b, 0);
+
+    const cerrarJornada = async () => {
+        if (pedidos.length === 0) {
+            alert("No hay pedidos para guardar.");
+            return;
+        }
+
+        if (!window.confirm("¿Estás seguro de cerrar la jornada? Esto guardará los pedidos en la base de datos y limpiará la lista actual.")) {
+            return;
+        }
+
+        // Agrupar pedidos por cliente
+        const agrupados = pedidos.reduce((acc, p) => {
+            if (!acc[p.cliente]) {
+                acc[p.cliente] = {
+                    cliente: p.cliente,
+                    items: [],
+                    total: 0
+                };
+            }
+            
+            // Adaptar item al formato del schema
+            const itemFormateado = {
+                nombre: p.vianda,
+                precio: p.precio,
+                cantidad: p.cantidad
+            };
+            
+            acc[p.cliente].items.push(itemFormateado);
+            acc[p.cliente].total += (p.cantidad * p.precio);
+            
+            return acc;
+        }, {});
+
+        const payload = Object.values(agrupados);
+
+        try {
+            const response = await fetch("http://localhost:3000/api/pedidos/sincronizar", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) {
+                throw new Error("Error al sincronizar con el servidor");
+            }
+
+            const data = await response.json();
+            alert(`¡Jornada cerrada con éxito! ${data.cantidad} pedidos guardados en MongoDB.`);
+            setPedidos([]); // Limpiar la jornada
+        } catch (error) {
+            console.error("Error cerrando jornada:", error);
+            alert("Hubo un error al guardar los pedidos. Revisa la consola.");
+        }
+    };
 
     const RenderLista = ({ titulo, totales, color, icono }) => (
         <div style={{ marginBottom: '2.5rem' }}>
@@ -52,9 +109,15 @@ function ContadorVentas() {
 
     return (
         <div className="container" style={{ paddingBottom: '2rem' }}>
-            <header className="header" style={{ marginBottom: '1rem' }}>
+            <header className="header" style={{ marginBottom: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <h1>Estado De Hoy</h1>
-                
+                <button 
+                    onClick={cerrarJornada}
+                    className="btn-primary" 
+                    style={{ background: 'var(--primary)', padding: '0.5rem 1rem', borderRadius: '8px', fontWeight: 'bold' }}
+                >
+                    💾 Cerrar Jornada
+                </button>
             </header>
 
             <main className="main-content">
