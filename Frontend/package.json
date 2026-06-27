@@ -10,9 +10,13 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "dexie": "^4.4.4",
+    "dexie-react-hooks": "^4.4.0",
+    "lucide-react": "^1.21.0",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
-    "react-router-dom": "^7.14.0"
+    "react-router-dom": "^7.14.0",
+    "react-toastify": "^11.1.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.4",

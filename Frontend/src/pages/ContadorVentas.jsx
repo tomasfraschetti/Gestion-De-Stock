@@ -1,145 +1,107 @@
-import { useContext } from "react";
-import { StockContext } from "../context/StockContext";
-import { useNavigate } from "react-router-dom";
+import { useStock } from "../context/StockContext";
+import { Save } from "lucide-react";
+import { SeccionPedidos } from "../components/PedidoCard";
+
+/* Agrupa los pedidos (un registro por vianda) por cliente */
+function agruparPorCliente(lista) {
+    const mapa = {};
+    for (const p of lista) {
+        if (!mapa[p.cliente]) {
+            mapa[p.cliente] = {
+                cliente: p.cliente,
+                entrega: p.entrega || "Retira",
+                domicilio: p.domicilio || "",
+                items: [],
+            };
+        }
+        mapa[p.cliente].items.push(p);
+    }
+    return Object.values(mapa);
+}
 
 function ContadorVentas() {
-    const { pedidos, setPedidos } = useContext(StockContext);
-    const navigate = useNavigate();
+    const { pedidos, limpiarJornada } = useStock();
 
-    // Separamos pedidos
-    const pedidosEntregados = pedidos.filter(p => p.finalizado === true);
-    const pedidosPendientes = pedidos.filter(p => !p.finalizado);
+    const entregados = pedidos.filter(p => p.finalizado === true);
+    const pendientes = pedidos.filter(p => !p.finalizado);
 
-    // Función para procesar totales
-    const obtenerTotales = (lista) => {
-        return lista.reduce((acc, p) => {
-            if (!acc[p.vianda]) acc[p.vianda] = 0;
-            acc[p.vianda] += Number(p.cantidad);
-            return acc;
-        }, {});
-    };
+    const gruposEntregados = agruparPorCliente(entregados);
+    const gruposPendientes = agruparPorCliente(pendientes);
 
-    const totalesEntregados = obtenerTotales(pedidosEntregados);
-    const totalesPendientes = obtenerTotales(pedidosPendientes);
-
-    const sumaEntregados = Object.values(totalesEntregados).reduce((a, b) => a + b, 0);
-    const sumaPendientes = Object.values(totalesPendientes).reduce((a, b) => a + b, 0);
+    const sumaPendientes  = pendientes.reduce((a, p) => a + Number(p.cantidad), 0);
+    const sumaEntregados  = entregados.reduce((a, p) => a + Number(p.cantidad), 0);
 
     const cerrarJornada = async () => {
-        if (pedidos.length === 0) {
-            alert("No hay pedidos para guardar.");
-            return;
-        }
+        if (!pedidos.length) { alert("No hay pedidos para guardar."); return; }
+        if (!window.confirm("¿Cerrar la jornada? Se enviará todo al servidor y se limpiará la lista.")) return;
 
-        if (!window.confirm("¿Estás seguro de cerrar la jornada? Esto guardará los pedidos en la base de datos y limpiará la lista actual.")) {
-            return;
-        }
-
-        // Agrupar pedidos por cliente
         const agrupados = pedidos.reduce((acc, p) => {
-            if (!acc[p.cliente]) {
-                acc[p.cliente] = {
-                    cliente: p.cliente,
-                    items: [],
-                    total: 0
-                };
-            }
-            
-            // Adaptar item al formato del schema
-            const itemFormateado = {
-                nombre: p.vianda,
-                precio: p.precio,
-                cantidad: p.cantidad
-            };
-            
-            acc[p.cliente].items.push(itemFormateado);
-            acc[p.cliente].total += (p.cantidad * p.precio);
-            
+            if (!acc[p.cliente]) acc[p.cliente] = { cliente: p.cliente, items: [], total: 0 };
+            acc[p.cliente].items.push({ nombre: p.vianda, precio: p.precio, cantidad: p.cantidad });
+            acc[p.cliente].total += p.cantidad * p.precio;
             return acc;
         }, {});
 
-        const payload = Object.values(agrupados);
-
         try {
-            const response = await fetch("http://localhost:3000/api/pedidos/sincronizar", {
+            const res = await fetch("http://localhost:3000/api/pedidos/sincronizar", {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(payload)
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(Object.values(agrupados)),
             });
-
-            if (!response.ok) {
-                throw new Error("Error al sincronizar con el servidor");
-            }
-
-            const data = await response.json();
-            alert(`¡Jornada cerrada con éxito! ${data.cantidad} pedidos guardados en MongoDB.`);
-            setPedidos([]); // Limpiar la jornada
-        } catch (error) {
-            console.error("Error cerrando jornada:", error);
-            alert("Hubo un error al guardar los pedidos. Revisa la consola.");
+            if (!res.ok) throw new Error();
+            const data = await res.json();
+            alert(`¡Jornada cerrada! ${data.cantidad} pedidos guardados.`);
+            await limpiarJornada();
+        } catch {
+            alert("Error al guardar. Revisá la consola.");
         }
     };
 
-    const RenderLista = ({ titulo, totales, color, icono }) => (
-        <div style={{ marginBottom: '2.5rem' }}>
-            <h2 style={{ color: color, fontSize: '1.2rem', borderBottom: `1px solid ${color}`, paddingBottom: '0.5rem', marginBottom: '1rem' }}>
-                {icono} {titulo}
-            </h2>
-            {Object.keys(totales).length === 0 ? (
-                <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', fontStyle: 'italic' }}>Sin movimientos.</p>
-            ) : (
-                Object.keys(totales).map(nombre => (
-                    <div key={nombre} className="card" style={{ 
-                        display: 'flex', 
-                        justifyContent: 'space-between', 
-                        alignItems: 'center',
-                        padding: '0.75rem 1rem',
-                        marginBottom: '0.5rem',
-                        borderLeft: `4px solid ${color}` 
-                    }}>
-                        <span style={{ fontWeight: '500' }}>{nombre}</span>
-                        <span style={{ fontSize: '1.2rem', fontWeight: 'bold', color: color }}>x{totales[nombre]}</span>
-                    </div>
-                ))
-            )}
-        </div>
-    );
-
     return (
-        <div className="container" style={{ paddingBottom: '2rem' }}>
-            <header className="header" style={{ marginBottom: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <h1>Estado De Hoy</h1>
-                <button 
-                    onClick={cerrarJornada}
-                    className="btn-primary" 
-                    style={{ background: 'var(--primary)', padding: '0.5rem 1rem', borderRadius: '8px', fontWeight: 'bold' }}
-                >
-                    💾 Cerrar Jornada
-                </button>
+        <main className="page">
+            {/* HEADER */}
+            <header className="page-header">
+                <h1>Julia Retamal</h1>
+                <p className="subtitle">Estado del día</p>
+                <div className="chess-line" />
             </header>
 
-            <main className="main-content">
-                
-                {/* RESUMEN RÁPIDO */}
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', marginBottom: '2rem' }}>
-                    <div className="card" style={{ textAlign: 'center', background: 'rgba(239, 68, 68, 0.1)', border: '1px solid var(--danger)', padding: '1rem' }}>
-                        <span style={{ fontSize: '1.8rem', fontWeight: 'bold', color: 'var(--danger)', display: 'block' }}>{sumaPendientes}</span>
-                        <span style={{ fontSize: '0.65rem', textTransform: 'uppercase', color: 'var(--danger)', fontWeight: 'bold' }}>Faltan</span>
-                    </div>
-                    <div className="card" style={{ textAlign: 'center', background: 'rgba(16, 185, 129, 0.1)', border: '1px solid var(--success)', padding: '1rem' }}>
-                        <span style={{ fontSize: '1.8rem', fontWeight: 'bold', color: 'var(--success)', display: 'block' }}>{sumaEntregados}</span>
-                        <span style={{ fontSize: '0.65rem', textTransform: 'uppercase', color: 'var(--success)', fontWeight: 'bold' }}>Listas</span>
-                    </div>
+            {/* STATS */}
+            <div className="stat-grid">
+                <div className="stat stat--danger">
+                    <span className="stat__num">{sumaPendientes}</span>
+                    <span className="stat__label">Faltan</span>
                 </div>
+                <div className="stat stat--success">
+                    <span className="stat__num">{sumaEntregados}</span>
+                    <span className="stat__label">Listas</span>
+                </div>
+            </div>
 
-                {/* DETALLE POR VIANDA */}
-                <RenderLista titulo="PENDIENTES" totales={totalesPendientes} color="var(--warning)" icono="⏳" />
-                <RenderLista titulo="ENTREGADAS" totales={totalesEntregados} color="var(--success)" icono="✅" />
+            {/* PENDIENTES */}
+            <SeccionPedidos
+                titulo="PENDIENTES"
+                grupos={gruposPendientes}
+                done={false}
+            />
 
-            </main>
-        </div>
+            {/* ENTREGADOS */}
+            <SeccionPedidos
+                titulo="ENTREGADAS"
+                grupos={gruposEntregados}
+                done={true}
+            />
+
+            {/* CERRAR JORNADA */}
+            <button
+                className="btn btn--primary"
+                onClick={cerrarJornada}
+                style={{ fontSize: "1rem", letterSpacing: "0.03em" }}
+            >
+                <Save size={18} color="currentColor" strokeWidth={2} />
+                Cerrar Jornada
+            </button>
+        </main>
     );
 }
 
