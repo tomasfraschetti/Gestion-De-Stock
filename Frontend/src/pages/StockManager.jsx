@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useStock } from "../context/StockContext";
+import { toast } from "react-toastify";
 import {
     UserRound,
     MapPin,
@@ -61,7 +62,7 @@ function StockManager() {
     }, [viandaId, viandasDisponibles]);
 
     const agregarItem = () => {
-        if (!viandaId || !cantidad || !precio) { alert("Completa los datos de la vianda"); return; }
+        if (!viandaId || !cantidad || !precio) { toast.warn("Completa los datos de la vianda"); return; }
         const vObj = viandasDisponibles.find(v => v.id === Number(viandaId));
         setItems(prev => [...prev, {
             id: Date.now() + Math.random(),
@@ -75,8 +76,8 @@ function StockManager() {
 
     const finalizar = async (e) => {
         e.preventDefault();
-        if (!cliente)                         return alert("Falta el nombre del cliente");
-        if (entrega === "Envío" && !domicilio) return alert("Falta el domicilio");
+        if (!cliente)                          { toast.warn("Falta el nombre del cliente"); return; }
+        if (entrega === "Envío" && !domicilio) { toast.warn("Falta el domicilio"); return; }
 
         let pedidosAGuardar = [];
         if (items.length === 0 && viandaId) {
@@ -85,13 +86,14 @@ function StockManager() {
         } else if (items.length > 0) {
             pedidosAGuardar = items.map(item => ({ ...item, cliente, entrega, domicilio: entrega === "Envío" ? domicilio : "", fecha: new Date().toLocaleDateString() }));
         } else {
-            return alert("Agrega al menos una vianda");
+            toast.warn("Agrega al menos una vianda");
+            return;
         }
 
         await agregarPedidos(pedidosAGuardar);
         await guardarCliente(cliente, entrega === "Envío" ? domicilio : "");
         setCliente(""); setItems([]); setViandaId(""); setPrecio(""); setEntrega("Retira"); setDomicilio("");
-        alert("¡Pedido guardado!");
+        toast.success("¡Pedido guardado!");
     };
 
     const subtotal = items.reduce((acc, i) => acc + i.subtotal, 0);
@@ -120,7 +122,6 @@ function StockManager() {
                         value={cliente}
                         onChange={e => { setCliente(e.target.value); setMostrarSugerencias(true); }}
                         onFocus={() => cliente.length > 0 && setMostrarSugerencias(true)}
-                        disabled={items.length > 0}
                         placeholder="Ej. María García"
                         autoComplete="off"
                     />

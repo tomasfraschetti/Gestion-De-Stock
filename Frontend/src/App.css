@@ -36,19 +36,26 @@
 
   /* Patrón ajedrez */
   --chess-size: 4px;
-  --chess-pattern: repeating-conic-gradient(
-      var(--clr-primary) 0% 25%,
-      var(--clr-bg) 0% 50%
-    ) 0 0 / calc(var(--chess-size) * 2) calc(var(--chess-size) * 2);
+  --chess-pattern: repeating-conic-gradient(var(--clr-primary) 0% 25%,
+      var(--clr-bg) 0% 50%) 0 0 / calc(var(--chess-size) * 2) calc(var(--chess-size) * 2);
 }
 
 /* ============================================================
    BASE
    ============================================================ */
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
 body {
-  background: var(--clr-bg);
+  background-color: var(--clr-bg);
+  /*background-image: url('/background.jpg'); */
+  background-repeat: repeat;
+  background-position: top left;
   font-family: 'Inter', system-ui, sans-serif;
   color: var(--clr-text);
   -webkit-font-smoothing: antialiased;
@@ -161,13 +168,21 @@ body {
   &--danger {
     border-color: var(--clr-danger);
     background: rgba(180, 75, 44, 0.06);
-    & .stat__num, & .stat__label { color: var(--clr-danger); }
+
+    & .stat__num,
+    & .stat__label {
+      color: var(--clr-danger);
+    }
   }
 
   &--success {
     border-color: var(--clr-success);
     background: rgba(45, 106, 79, 0.06);
-    & .stat__num, & .stat__label { color: var(--clr-success); }
+
+    & .stat__num,
+    & .stat__label {
+      color: var(--clr-success);
+    }
   }
 }
 
@@ -192,11 +207,21 @@ body {
   &--primary {
     background: var(--clr-primary);
     color: #fff;
-    &:hover { background: var(--clr-primary-hover); }
+
+    &:hover {
+      background: var(--clr-primary-hover);
+    }
   }
 
-  &--success { background: var(--clr-success); color: #fff; }
-  &--danger  { background: var(--clr-danger);  color: #fff; }
+  &--success {
+    background: var(--clr-success);
+    color: #fff;
+  }
+
+  &--danger {
+    background: var(--clr-danger);
+    color: #fff;
+  }
 
   &--ghost {
     background: transparent;
@@ -254,7 +279,7 @@ body {
 }
 
 .qty-control__btn:active {
-  background: rgba(27,59,43,0.15);
+  background: rgba(27, 59, 43, 0.15);
 }
 
 .qty-control__num {
@@ -382,7 +407,9 @@ body {
     font-size: 0.95rem;
   }
 
-  & + & { margin-top: var(--space-xs); }
+  &+& {
+    margin-top: var(--space-xs);
+  }
 
   &--done {
     opacity: 0.7;
@@ -425,10 +452,14 @@ body {
     cursor: pointer;
     height: 100%;
 
-    &--active { color: var(--clr-primary); }
+    &--active {
+      color: var(--clr-primary);
+    }
   }
 
-  & .nav-btn__icon { font-size: 1.4rem; }
+  & .nav-btn__icon {
+    font-size: 1.4rem;
+  }
 }
 
 /* ============================================================
@@ -497,7 +528,7 @@ body {
 .entrega-toggle__btn--active {
   background: var(--clr-surface);
   color: var(--clr-primary);
-  box-shadow: 0 1px 4px rgba(27,59,43,0.12);
+  box-shadow: 0 1px 4px rgba(27, 59, 43, 0.12);
 }
 
 /* ============================================================
@@ -513,11 +544,13 @@ body {
   overflow: hidden;
 }
 
-.pedido-card:last-child { margin-bottom: 0; }
+.pedido-card:last-child {
+  margin-bottom: 0;
+}
 
 .pedido-card:hover {
   border-color: var(--clr-primary);
-  box-shadow: 0 2px 10px rgba(27,59,43,0.1);
+  box-shadow: 0 2px 10px rgba(27, 59, 43, 0.1);
 }
 
 .pedido-card--done {
@@ -526,11 +559,13 @@ body {
   border-image: var(--chess-pattern) 1;
 }
 
-.pedido-card--done:hover { opacity: 1; }
+.pedido-card--done:hover {
+  opacity: 1;
+}
 
 .pedido-card--open {
   border-color: var(--clr-primary);
-  box-shadow: 0 4px 16px rgba(27,59,43,0.12);
+  box-shadow: 0 4px 16px rgba(27, 59, 43, 0.12);
 }
 
 .pedido-card__header {
@@ -588,12 +623,12 @@ body {
 }
 
 .pedido-chip--envio {
-  background: rgba(27,59,43,0.08);
+  background: rgba(27, 59, 43, 0.08);
   color: var(--clr-primary);
 }
 
 .pedido-chip--retira {
-  background: rgba(160,82,45,0.10);
+  background: rgba(160, 82, 45, 0.10);
   color: var(--clr-accent);
 }
 
@@ -606,8 +641,15 @@ body {
 }
 
 @keyframes slideDown {
-  from { opacity: 0; transform: translateY(-6px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .pedido-card__items {

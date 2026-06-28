@@ -1,59 +1,33 @@
 import { useNavigate, useLocation } from "react-router-dom";
-import { UtensilsCrossed, ClipboardList, Bike } from "lucide-react";
+import { UtensilsCrossed, ClipboardList, BarChart2 } from "lucide-react";
+
+const ICON_COLOR = "currentColor";
+
+const TABS = [
+    { label: "Menú",  path: "/",            Icon: UtensilsCrossed },
+    { label: "Carga", path: "/StockManager", Icon: ClipboardList   },
+    { label: "Total", path: "/Contador",     Icon: BarChart2       },
+];
 
 function Navbar() {
-    const navigate = useNavigate();
-    const location = useLocation();
-
-    const tabs = [
-        { name: "Viandas",  path: "/",            Icon: UtensilsCrossed },
-        { name: "Pedidos",  path: "/StockManager", Icon: ClipboardList   },
-        { name: "Entregas", path: "/Contador",     Icon: Bike            },
-    ];
+    const navigate  = useNavigate();
+    const { pathname } = useLocation();
 
     return (
-        <nav style={{
-            position: 'fixed',
-            bottom: 0,
-            left: 0,
-            right: 0,
-            backgroundColor: 'var(--card-bg)',
-            display: 'flex',
-            justifyContent: 'space-around',
-            padding: '0.75rem 0',
-            borderTop: '1px solid var(--border)',
-            zIndex: 1000,
-            boxShadow: '0 -4px 10px rgba(0,0,0,0.3)'
-        }}>
-            {tabs.map(({ name, path, Icon }) => {
-                const active = location.pathname === path;
-                return (
-                    <button
-                        key={path}
-                        onClick={() => navigate(path)}
-                        style={{
-                            background: 'none',
-                            border: 'none',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            alignItems: 'center',
-                            gap: '0.2rem',
-                            color: active ? 'var(--primary)' : 'var(--text-muted)',
-                            cursor: 'pointer',
-                            transition: 'color 0.2s',
-                            fontSize: '0.75rem',
-                            fontWeight: '600'
-                        }}
-                    >
-                        <Icon
-                            size={22}
-                            color="currentColor"
-                            strokeWidth={active ? 2.2 : 1.6}
-                        />
-                        {name}
-                    </button>
-                );
-            })}
+        <nav className="navbar">
+            {TABS.map(({ label, path, Icon }) => (
+                <button
+                    key={path}
+                    className={`nav-btn${pathname === path ? " nav-btn--active" : ""}`}
+                    onClick={() => navigate(path)}
+                    aria-label={label}
+                >
+                    <span className="nav-btn__icon">
+                        <Icon size={20} color={ICON_COLOR} strokeWidth={1.8} />
+                    </span>
+                    {label}
+                </button>
+            ))}
         </nav>
     );
 }

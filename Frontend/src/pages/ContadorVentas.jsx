@@ -1,6 +1,7 @@
 import { useStock } from "../context/StockContext";
 import { Save } from "lucide-react";
 import { SeccionPedidos } from "../components/PedidoCard";
+import { toast } from "react-toastify";
 
 /* Agrupa los pedidos (un registro por vianda) por cliente */
 function agruparPorCliente(lista) {
@@ -31,10 +32,7 @@ function ContadorVentas() {
     const sumaPendientes  = pendientes.reduce((a, p) => a + Number(p.cantidad), 0);
     const sumaEntregados  = entregados.reduce((a, p) => a + Number(p.cantidad), 0);
 
-    const cerrarJornada = async () => {
-        if (!pedidos.length) { alert("No hay pedidos para guardar."); return; }
-        if (!window.confirm("¿Cerrar la jornada? Se enviará todo al servidor y se limpiará la lista.")) return;
-
+    const procesarCierre = async () => {
         const agrupados = pedidos.reduce((acc, p) => {
             if (!acc[p.cliente]) acc[p.cliente] = { cliente: p.cliente, items: [], total: 0 };
             acc[p.cliente].items.push({ nombre: p.vianda, precio: p.precio, cantidad: p.cantidad });
@@ -50,11 +48,42 @@ function ContadorVentas() {
             });
             if (!res.ok) throw new Error();
             const data = await res.json();
-            alert(`¡Jornada cerrada! ${data.cantidad} pedidos guardados.`);
+            toast.success(`¡Jornada cerrada! ${data.cantidad} pedidos guardados.`);
             await limpiarJornada();
         } catch {
-            alert("Error al guardar. Revisá la consola.");
+            toast.error("Error al guardar. Revisá la consola.");
         }
+    };
+
+    const cerrarJornada = () => {
+        if (!pedidos.length) { 
+            toast.warn("No hay pedidos para guardar."); 
+            return; 
+        }
+        
+        toast(
+            ({ closeToast }) => (
+                <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                    <p style={{ margin: 0, fontWeight: 500, color: "var(--clr-text)" }}>¿Cerrar la jornada?</p>
+                    <p style={{ margin: 0, fontSize: "0.9rem", color: "var(--clr-text)" }}>Se enviará todo al servidor y se limpiará la lista.</p>
+                    <div style={{ display: 'flex', gap: '8px', marginTop: '8px' }}>
+                        <button 
+                            onClick={() => { procesarCierre(); closeToast(); }} 
+                            style={{ padding: '6px 12px', background: 'var(--clr-primary)', color: '#111', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
+                        >
+                            Confirmar
+                        </button>
+                        <button 
+                            onClick={closeToast} 
+                            style={{ padding: '6px 12px', background: 'transparent', border: '1px solid var(--clr-border)', color: 'var(--clr-text)', borderRadius: '4px', cursor: 'pointer' }}
+                        >
+                            Cancelar
+                        </button>
+                    </div>
+                </div>
+            ),
+            { autoClose: false, closeOnClick: false }
+        );
     };
 
     return (

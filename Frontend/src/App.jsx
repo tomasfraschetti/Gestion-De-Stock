@@ -3,7 +3,7 @@ import { Routes, Route } from 'react-router-dom'
 import Inicio from "./pages/Inicio"
 import StockManager from "./pages/StockManager"
 import ContadorVentas from "./pages/ContadorVentas"
-import Navbar from "./Navbar"
+import Navbar from "./components/Navbar"
 
 function App() {
   return (

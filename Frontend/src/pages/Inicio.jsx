@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useStock } from "../context/StockContext";
+import { toast } from "react-toastify";
 import {
     Plus,
     Trash2,
@@ -64,9 +65,29 @@ function Inicio() {
                 <button
                     className="btn btn--icon"
                     title="Eliminar permanentemente"
-                    onClick={async () => {
-                        if (window.confirm("¿Eliminar esta vianda del menú permanente?"))
-                            await eliminarVianda(vianda.id);
+                    onClick={() => {
+                        toast(
+                            ({ closeToast }) => (
+                                <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                                    <p style={{ margin: 0, fontWeight: 500, color: "var(--clr-text)" }}>¿Eliminar esta vianda?</p>
+                                    <div style={{ display: 'flex', gap: '8px', marginTop: '8px' }}>
+                                        <button 
+                                            onClick={async () => { await eliminarVianda(vianda.id); closeToast(); }} 
+                                            style={{ padding: '6px 12px', background: 'var(--clr-danger)', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
+                                        >
+                                            Eliminar
+                                        </button>
+                                        <button 
+                                            onClick={closeToast} 
+                                            style={{ padding: '6px 12px', background: 'transparent', border: '1px solid var(--clr-border)', color: 'var(--clr-text)', borderRadius: '4px', cursor: 'pointer' }}
+                                        >
+                                            Cancelar
+                                        </button>
+                                    </div>
+                                </div>
+                            ),
+                            { autoClose: false, closeOnClick: false }
+                        );
                     }}
                     style={{ display: "flex", alignItems: "center", justifyContent: "center" }}
                 >
