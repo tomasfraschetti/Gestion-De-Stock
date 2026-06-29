@@ -1,5 +1,5 @@
 import { useStock } from "../context/StockContext";
-import { Save } from "lucide-react";
+import { Save, CheckCircle2, Clock } from "lucide-react";
 import { SeccionPedidos } from "../components/PedidoCard";
 import { toast } from "react-toastify";
 
@@ -20,6 +20,32 @@ function agruparPorCliente(lista) {
     return Object.values(mapa);
 }
 
+/* ── Botones del toast de confirmación de cierre ── */
+function ToastCerrarJornada({ closeToast, onConfirmar }) {
+    return (
+        <div className="flex flex-col gap-2.5">
+            <p className="m-0 font-medium text-gray-900">¿Cerrar la jornada?</p>
+            <p className="m-0 text-[0.9rem] text-gray-700">
+                Se enviará todo al servidor y se limpiará la lista.
+            </p>
+            <div className="flex gap-2 mt-2">
+                <button
+                    onClick={() => { onConfirmar(); closeToast(); }}
+                    className="px-3 py-1.5 bg-green-900 text-white border-none rounded cursor-pointer font-bold text-sm hover:bg-green-800 transition-colors"
+                >
+                    Confirmar
+                </button>
+                <button
+                    onClick={closeToast}
+                    className="px-3 py-1.5 bg-transparent border border-stone-200 text-gray-900 rounded cursor-pointer text-sm hover:bg-stone-100 transition-colors"
+                >
+                    Cancelar
+                </button>
+            </div>
+        </div>
+    );
+}
+
 function ContadorVentas() {
     const { pedidos, limpiarJornada } = useStock();
 
@@ -29,8 +55,8 @@ function ContadorVentas() {
     const gruposEntregados = agruparPorCliente(entregados);
     const gruposPendientes = agruparPorCliente(pendientes);
 
-    const sumaPendientes  = pendientes.reduce((a, p) => a + Number(p.cantidad), 0);
-    const sumaEntregados  = entregados.reduce((a, p) => a + Number(p.cantidad), 0);
+    const sumaPendientes = pendientes.reduce((a, p) => a + Number(p.cantidad), 0);
+    const sumaEntregados = entregados.reduce((a, p) => a + Number(p.cantidad), 0);
 
     const procesarCierre = async () => {
         const agrupados = pedidos.reduce((acc, p) => {
@@ -56,76 +82,59 @@ function ContadorVentas() {
     };
 
     const cerrarJornada = () => {
-        if (!pedidos.length) { 
-            toast.warn("No hay pedidos para guardar."); 
-            return; 
+        if (!pedidos.length) {
+            toast.warn("No hay pedidos para guardar.");
+            return;
         }
-        
         toast(
             ({ closeToast }) => (
-                <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-                    <p style={{ margin: 0, fontWeight: 500, color: "var(--clr-text)" }}>¿Cerrar la jornada?</p>
-                    <p style={{ margin: 0, fontSize: "0.9rem", color: "var(--clr-text)" }}>Se enviará todo al servidor y se limpiará la lista.</p>
-                    <div style={{ display: 'flex', gap: '8px', marginTop: '8px' }}>
-                        <button 
-                            onClick={() => { procesarCierre(); closeToast(); }} 
-                            style={{ padding: '6px 12px', background: 'var(--clr-primary)', color: '#111', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
-                        >
-                            Confirmar
-                        </button>
-                        <button 
-                            onClick={closeToast} 
-                            style={{ padding: '6px 12px', background: 'transparent', border: '1px solid var(--clr-border)', color: 'var(--clr-text)', borderRadius: '4px', cursor: 'pointer' }}
-                        >
-                            Cancelar
-                        </button>
-                    </div>
-                </div>
+                <ToastCerrarJornada closeToast={closeToast} onConfirmar={procesarCierre} />
             ),
             { autoClose: false, closeOnClick: false }
         );
     };
 
     return (
-        <main className="page">
+        <main className="flex flex-col gap-4 px-4 pt-4 pb-24">
             {/* HEADER */}
-            <header className="page-header">
-                <h1>Julia Retamal</h1>
-                <p className="subtitle">Estado del día</p>
-                <div className="chess-line" />
+            <header className="flex flex-col items-center gap-1 py-6">
+                <h1 className="font-serif text-4xl text-green-900 leading-tight">Julia Retamal</h1>
+                <p className="text-gray-500 text-[0.85rem]">Estado del día</p>
+                <div className="chess-line w-full mt-1" />
             </header>
 
             {/* STATS */}
-            <div className="stat-grid">
-                <div className="stat stat--danger">
-                    <span className="stat__num">{sumaPendientes}</span>
-                    <span className="stat__label">Faltan</span>
+            <div className="grid grid-cols-2 gap-2">
+                {/* Pendientes */}
+                <div className="flex flex-col items-center justify-center p-4 bg-red-600/[0.06] border border-red-600 rounded-2xl shadow-sm text-center">
+                    <span className="text-[2.5rem] font-bold leading-none text-red-600">
+                        {sumaPendientes}
+                    </span>
+                    <span className="text-[0.65rem] font-bold uppercase tracking-widest mt-1 text-red-600">
+                        Faltan
+                    </span>
                 </div>
-                <div className="stat stat--success">
-                    <span className="stat__num">{sumaEntregados}</span>
-                    <span className="stat__label">Listas</span>
+                {/* Entregados */}
+                <div className="flex flex-col items-center justify-center p-4 bg-green-700/[0.06] border border-green-700 rounded-2xl shadow-sm text-center">
+                    <span className="text-[2.5rem] font-bold leading-none text-green-700">
+                        {sumaEntregados}
+                    </span>
+                    <span className="text-[0.65rem] font-bold uppercase tracking-widest mt-1 text-green-700">
+                        Listas
+                    </span>
                 </div>
             </div>
 
             {/* PENDIENTES */}
-            <SeccionPedidos
-                titulo="PENDIENTES"
-                grupos={gruposPendientes}
-                done={false}
-            />
+            <SeccionPedidos titulo="PENDIENTES" grupos={gruposPendientes} done={false} />
 
             {/* ENTREGADOS */}
-            <SeccionPedidos
-                titulo="ENTREGADAS"
-                grupos={gruposEntregados}
-                done={true}
-            />
+            <SeccionPedidos titulo="ENTREGADAS" grupos={gruposEntregados} done={true} />
 
             {/* CERRAR JORNADA */}
             <button
-                className="btn btn--primary"
+                className="flex items-center justify-center gap-2 w-full h-12 rounded-xl bg-green-900 text-white border-none font-semibold text-base tracking-wide cursor-pointer transition-colors hover:bg-green-800"
                 onClick={cerrarJornada}
-                style={{ fontSize: "1rem", letterSpacing: "0.03em" }}
             >
                 <Save size={18} color="currentColor" strokeWidth={2} />
                 Cerrar Jornada

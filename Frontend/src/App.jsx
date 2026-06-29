@@ -9,16 +9,16 @@ import 'react-toastify/dist/ReactToastify.css'
 
 function App() {
   return (
-    <div style={{ position: 'relative', minHeight: '100svh' }}>
+    <div className="relative min-h-screen bg-stone-50">
       <Routes>
         <Route path='/' element={<Inicio />} />
         <Route path='/StockManager' element={<StockManager />} />
         <Route path='/Contador' element={<ContadorVentas />} />
       </Routes>
       <Navbar />
-      <ToastContainer 
-        position="top-right" 
-        autoClose={3000} 
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
         hideProgressBar={false}
         newestOnTop={false}
         closeOnClick
@@ -33,4 +33,3 @@ function App() {
 }
 
 export default App
-

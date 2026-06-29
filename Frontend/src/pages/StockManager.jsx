@@ -24,13 +24,11 @@ function StockManager() {
     const [domicilio, setDomicilio] = useState("");
     const [items,     setItems]     = useState([]);
 
-    // Autocompletado
     const [sugerencias,        setSugerencias]        = useState([]);
     const [mostrarSugerencias, setMostrarSugerencias] = useState(false);
     const inputRef      = useRef(null);
     const contenedorRef = useRef(null);
 
-    // Filtra clientes al escribir
     useEffect(() => {
         const texto = cliente.trim().toLowerCase();
         if (texto.length < 1 || !clientes) { setSugerencias([]); return; }
@@ -39,7 +37,6 @@ function StockManager() {
         setMostrarSugerencias(filtrados.length > 0);
     }, [cliente, clientes]);
 
-    // Cierra dropdown al click fuera
     useEffect(() => {
         const fn = e => {
             if (contenedorRef.current && !contenedorRef.current.contains(e.target))
@@ -55,7 +52,6 @@ function StockManager() {
         setMostrarSugerencias(false);
     };
 
-    // Autocompleta precio al elegir vianda
     useEffect(() => {
         const v = viandasDisponibles.find(v => v.id === Number(viandaId));
         if (v) setPrecio(v.precio);
@@ -69,7 +65,7 @@ function StockManager() {
             vianda: vObj.nombre,
             cantidad: Number(cantidad),
             precio: Number(precio),
-            subtotal: Number(cantidad) * Number(precio)
+            subtotal: Number(cantidad) * Number(precio),
         }]);
         setViandaId(""); setCantidad(1); setPrecio("");
     };
@@ -98,87 +94,86 @@ function StockManager() {
 
     const subtotal = items.reduce((acc, i) => acc + i.subtotal, 0);
 
+    /* ── Clases reutilizables ─────────────────────────────── */
+    const inputCls = "bg-stone-50 border border-stone-200 rounded-xl text-gray-900 px-4 h-[52px] font-sans text-base w-full outline-none focus:border-green-900 focus:ring-2 focus:ring-green-900/10 transition-shadow";
+    const labelCls = "text-[0.8rem] font-semibold uppercase tracking-widest text-gray-500";
+    const fieldCls = "flex flex-col gap-1 mb-4";
+
     return (
-        <main className="page">
-            <header className="page-header">
-                <h1>Julia Retamal</h1>
-                <p className="subtitle">Anotar Pedido</p>
-                <div className="chess-line" />
+        <main className="flex flex-col gap-4 px-4 pt-4 pb-24">
+            <header className="flex flex-col items-center gap-1 py-6">
+                <h1 className="font-serif text-4xl text-green-900 leading-tight">Julia Retamal</h1>
+                <p className="text-gray-500 text-[0.85rem]">Anotar Pedido</p>
+                <div className="chess-line w-full mt-1" />
             </header>
 
-            {/* CLIENTE */}
-            <section className="card">
-                <h2 className="card__title" style={{ display: "flex", alignItems: "center", gap: "var(--space-sm)" }}>
-                    <UserRound size={18} color="var(--clr-primary)" strokeWidth={1.8} />
+            {/* ── CLIENTE ───────────────────────────────────── */}
+            <section className="bg-white border border-stone-200 rounded-2xl shadow-sm p-4">
+                <h2 className="flex items-center gap-2 text-base font-bold text-green-900 mb-4">
+                    <UserRound size={18} color="currentColor" strokeWidth={1.8} />
                     Cliente
                 </h2>
 
-                <div className="field" ref={contenedorRef} style={{ position: "relative" }}>
-                    <label htmlFor="clienteInput">Nombre</label>
-                    <input
-                        id="clienteInput"
-                        ref={inputRef}
-                        type="text"
-                        value={cliente}
-                        onChange={e => { setCliente(e.target.value); setMostrarSugerencias(true); }}
-                        onFocus={() => cliente.length > 0 && setMostrarSugerencias(true)}
-                        placeholder="Ej. María García"
-                        autoComplete="off"
-                    />
-                    {mostrarSugerencias && sugerencias.length > 0 && (
-                        <ul style={{
-                            position: "absolute", top: "100%", left: 0, right: 0, zIndex: 100,
-                            background: "var(--clr-surface)", border: "1px solid var(--clr-border)",
-                            borderRadius: "var(--radius-card)", marginTop: "4px", padding: "var(--space-xs)",
-                            listStyle: "none", boxShadow: "0 8px 24px rgba(27,59,43,0.18)",
-                            maxHeight: "220px", overflowY: "auto",
-                        }}>
-                            {sugerencias.map(c => (
-                                <li
-                                    key={c.id}
-                                    onMouseDown={() => seleccionarCliente(c)}
-                                    onTouchStart={() => seleccionarCliente(c)}
-                                    style={{
-                                        padding: "var(--space-sm) var(--space-md)", cursor: "pointer",
-                                        borderRadius: "10px", display: "flex", flexDirection: "column",
-                                        gap: "2px", transition: "background 0.15s",
-                                    }}
-                                    onMouseEnter={e => e.currentTarget.style.background = "var(--clr-primary-tint)"}
-                                    onMouseLeave={e => e.currentTarget.style.background = "transparent"}
-                                >
-                                    <span style={{ fontWeight: 600, color: "var(--clr-text)", display: "flex", alignItems: "center", gap: "6px" }}>
-                                        <UserRound size={14} color="var(--clr-primary)" strokeWidth={2} />
-                                        {c.nombre}
-                                    </span>
-                                    {c.domicilio && (
-                                        <span style={{ fontSize: "0.8rem", color: "var(--clr-muted)", display: "flex", alignItems: "center", gap: "4px" }}>
-                                            <MapPin size={12} color="var(--clr-muted)" strokeWidth={2} />
-                                            {c.domicilio}
+                <div className={fieldCls} ref={contenedorRef}>
+                    <label htmlFor="clienteInput" className={labelCls}>Nombre</label>
+                    <div className="relative">
+                        <input
+                            id="clienteInput"
+                            ref={inputRef}
+                            type="text"
+                            value={cliente}
+                            onChange={e => { setCliente(e.target.value); setMostrarSugerencias(true); }}
+                            onFocus={() => cliente.length > 0 && setMostrarSugerencias(true)}
+                            placeholder="Ej. María García"
+                            autoComplete="off"
+                            className={inputCls}
+                        />
+                        {mostrarSugerencias && sugerencias.length > 0 && (
+                            <ul className="absolute top-full left-0 right-0 z-[100] bg-white border border-stone-200 rounded-2xl mt-1 p-1 list-none shadow-[0_8px_24px_rgba(0,0,0,0.12)] max-h-[220px] overflow-y-auto">
+                                {sugerencias.map(c => (
+                                    <li
+                                        key={c.id}
+                                        onMouseDown={() => seleccionarCliente(c)}
+                                        onTouchStart={() => seleccionarCliente(c)}
+                                        className="flex flex-col gap-0.5 px-4 py-2 rounded-xl cursor-pointer transition-colors hover:bg-green-900/[0.06]"
+                                    >
+                                        <span className="font-semibold text-gray-900 flex items-center gap-1.5">
+                                            <UserRound size={14} color="#14532d" strokeWidth={2} />
+                                            {c.nombre}
                                         </span>
-                                    )}
-                                </li>
-                            ))}
-                        </ul>
-                    )}
+                                        {c.domicilio && (
+                                            <span className="text-[0.8rem] text-gray-500 flex items-center gap-1">
+                                                <MapPin size={12} color="currentColor" strokeWidth={2} />
+                                                {c.domicilio}
+                                            </span>
+                                        )}
+                                    </li>
+                                ))}
+                            </ul>
+                        )}
+                    </div>
                 </div>
 
-                {/* Entrega */}
-                <div className="field">
-                    <label>Entrega</label>
-                    <div style={{ display: "flex", gap: "var(--space-sm)" }}>
+                {/* Tipo de entrega */}
+                <div className={fieldCls}>
+                    <label className={labelCls}>Entrega</label>
+                    <div className="flex gap-2">
                         {["Retira", "Envío"].map(op => (
-                            <label key={op} style={{
-                                flex: 1, display: "flex", alignItems: "center", justifyContent: "center",
-                                gap: "var(--space-sm)", height: "48px", border: "1px solid",
-                                borderColor: entrega === op ? "var(--clr-primary)" : "var(--clr-border)",
-                                borderRadius: "var(--radius-input)", cursor: "pointer",
-                                background: entrega === op ? "var(--clr-primary-tint)" : "transparent",
-                                fontWeight: entrega === op ? 700 : 400,
-                                color: entrega === op ? "var(--clr-primary)" : "var(--clr-muted)",
-                                transition: "all 0.15s",
-                            }}>
-                                <input type="radio" value={op} checked={entrega === op}
-                                    onChange={e => setEntrega(e.target.value)} style={{ display: "none" }} />
+                            <label
+                                key={op}
+                                className={`flex-1 flex items-center justify-center gap-2 h-12 border rounded-xl cursor-pointer font-sans transition-all text-base
+                                    ${entrega === op
+                                        ? "border-green-900 bg-green-900/[0.08] font-bold text-green-900"
+                                        : "border-stone-200 bg-transparent font-normal text-gray-500"
+                                    }`}
+                            >
+                                <input
+                                    type="radio"
+                                    value={op}
+                                    checked={entrega === op}
+                                    onChange={e => setEntrega(e.target.value)}
+                                    className="hidden"
+                                />
                                 {op === "Retira"
                                     ? <><Store size={16} color="currentColor" strokeWidth={1.8} /> Retira</>
                                     : <><Bike  size={16} color="currentColor" strokeWidth={1.8} /> Envío</>
@@ -189,35 +184,35 @@ function StockManager() {
                 </div>
 
                 {entrega === "Envío" && (
-                    <div className="field">
-                        <label htmlFor="domicilioInput">Dirección</label>
+                    <div className={fieldCls}>
+                        <label htmlFor="domicilioInput" className={labelCls}>Dirección</label>
                         <input
                             id="domicilioInput"
                             type="text"
                             value={domicilio}
                             onChange={e => setDomicilio(e.target.value)}
                             placeholder="Ej. Calle 123"
+                            className={inputCls}
                         />
                     </div>
                 )}
             </section>
 
-            {/* VIANDAS */}
-            <section className="card">
-                <h2 className="card__title" style={{ display: "flex", alignItems: "center", gap: "var(--space-sm)" }}>
-                    <UtensilsCrossed size={18} color="var(--clr-primary)" strokeWidth={1.8} />
+            {/* ── VIANDAS ───────────────────────────────────── */}
+            <section className="bg-white border border-stone-200 rounded-2xl shadow-sm p-4">
+                <h2 className="flex items-center gap-2 text-base font-bold text-green-900 mb-4">
+                    <UtensilsCrossed size={18} color="currentColor" strokeWidth={1.8} />
                     ¿Qué lleva?
                 </h2>
 
-                <div className="field">
-                    <label>Vianda y cantidad</label>
-                    <div style={{ display: "flex", alignItems: "center", gap: "var(--space-sm)" }}>
-                        {/* Selector — solo nombre */}
+                <div className={fieldCls}>
+                    <label className={labelCls}>Vianda y cantidad</label>
+                    <div className="flex items-center gap-2">
                         <select
                             id="viandaSelect"
                             value={viandaId}
                             onChange={e => setViandaId(e.target.value)}
-                            style={{ flex: 1 }}
+                            className="flex-1 bg-stone-50 border border-stone-200 rounded-xl text-gray-900 px-4 h-[52px] font-sans text-base outline-none focus:border-green-900 focus:ring-2 focus:ring-green-900/10 transition-shadow"
                         >
                             <option value="">— Seleccionar —</option>
                             {viandasDisponibles.map(v => (
@@ -225,22 +220,24 @@ function StockManager() {
                             ))}
                         </select>
 
-                        {/* Controles cantidad */}
-                        <div className="qty-control">
+                        {/* Stepper cantidad */}
+                        <div className="flex items-center gap-0.5 bg-stone-50 border border-stone-200 rounded-xl h-[52px] px-1 shrink-0">
                             <button
                                 type="button"
-                                className="qty-control__btn"
                                 onClick={() => setCantidad(c => Math.max(1, Number(c) - 1))}
                                 aria-label="Reducir cantidad"
+                                className="flex items-center justify-center w-[34px] h-[34px] rounded-lg bg-transparent border-none cursor-pointer text-green-900 hover:bg-green-900/[0.08] transition-colors"
                             >
                                 <Minus size={14} color="currentColor" strokeWidth={2.5} />
                             </button>
-                            <span className="qty-control__num">{cantidad}</span>
+                            <span className="min-w-[28px] text-center font-bold text-base text-gray-900 select-none">
+                                {cantidad}
+                            </span>
                             <button
                                 type="button"
-                                className="qty-control__btn"
                                 onClick={() => setCantidad(c => Number(c) + 1)}
                                 aria-label="Aumentar cantidad"
+                                className="flex items-center justify-center w-[34px] h-[34px] rounded-lg bg-transparent border-none cursor-pointer text-green-900 hover:bg-green-900/[0.08] transition-colors"
                             >
                                 <Plus size={14} color="currentColor" strokeWidth={2.5} />
                             </button>
@@ -248,44 +245,45 @@ function StockManager() {
                     </div>
                 </div>
 
-                <button type="button" className="btn btn--ghost" onClick={agregarItem}
-                    style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "var(--space-sm)" }}>
+                <button
+                    type="button"
+                    onClick={agregarItem}
+                    className="flex items-center justify-center gap-2 w-full h-12 rounded-xl bg-transparent border border-stone-200 text-gray-900 font-semibold text-base cursor-pointer transition-colors hover:bg-stone-100"
+                >
                     <Plus size={16} color="currentColor" strokeWidth={2.2} />
                     Agregar vianda
                 </button>
             </section>
 
-            {/* DETALLE */}
+            {/* ── DETALLE ───────────────────────────────────── */}
             {items.length > 0 && (
-                <section className="card">
-                    <h2 className="card__title" style={{ display: "flex", alignItems: "center", gap: "var(--space-sm)" }}>
-                        <ShoppingCart size={18} color="var(--clr-primary)" strokeWidth={1.8} />
+                <section className="bg-white border border-stone-200 rounded-2xl shadow-sm p-4">
+                    <h2 className="flex items-center gap-2 text-base font-bold text-green-900 mb-4">
+                        <ShoppingCart size={18} color="currentColor" strokeWidth={1.8} />
                         Detalle
                     </h2>
-                    <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-xs)" }}>
+                    <div className="flex flex-col gap-1">
                         {items.map(item => (
-                            <div key={item.id} style={{
-                                display: "flex", justifyContent: "space-between",
-                                fontSize: "0.9rem", padding: "var(--space-xs) 0"
-                            }}>
+                            <div
+                                key={item.id}
+                                className="flex justify-between text-[0.9rem] py-1"
+                            >
                                 <span><strong>{item.cantidad}x</strong> {item.vianda}</span>
-                                <span style={{ color: "var(--clr-primary)", fontWeight: 700 }}>${item.subtotal}</span>
+                                <span className="text-green-900 font-bold">${item.subtotal}</span>
                             </div>
                         ))}
                     </div>
-                    <div style={{
-                        display: "flex", justifyContent: "space-between", alignItems: "center",
-                        borderTop: "1px solid var(--clr-border)", paddingTop: "var(--space-sm)",
-                        marginTop: "var(--space-sm)", fontWeight: 700, fontSize: "1.1rem"
-                    }}>
+                    <div className="flex justify-between items-center border-t border-stone-200 pt-2 mt-2 font-bold text-[1.1rem]">
                         <span>Total</span>
-                        <span style={{ color: "var(--clr-primary)" }}>${subtotal}</span>
+                        <span className="text-green-900">${subtotal}</span>
                     </div>
                 </section>
             )}
 
-            <button className="btn btn--primary" onClick={finalizar}
-                style={{ fontSize: "1.1rem", letterSpacing: "0.03em", display: "flex", alignItems: "center", justifyContent: "center", gap: "var(--space-sm)" }}>
+            <button
+                className="flex items-center justify-center gap-2 w-full h-12 rounded-xl bg-green-900 text-white border-none font-semibold text-[1.1rem] tracking-wide cursor-pointer transition-colors hover:bg-green-800"
+                onClick={finalizar}
+            >
                 <CheckCircle2 size={20} color="currentColor" strokeWidth={2} />
                 Finalizar Pedido
             </button>

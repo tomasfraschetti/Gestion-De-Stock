@@ -57,6 +57,14 @@ export const StockProvider = ({ children }) => {
         await db.pedidos.update(id, { finalizado: valor });
     };
 
+    const eliminarPedido = async (id) => {
+        await db.pedidos.delete(id);
+    };
+
+    const actualizarCantidadPedido = async (id, cantidad) => {
+        await db.pedidos.update(id, { cantidad: Number(cantidad) });
+    };
+
     const limpiarJornada = async () => {
         await db.pedidos.clear();
     };
@@ -87,6 +95,8 @@ export const StockProvider = ({ children }) => {
             setPedidos,
             agregarPedidos,
             marcarFinalizado,
+            eliminarPedido,
+            actualizarCantidadPedido,
             limpiarJornada,
             // Clientes
             guardarCliente,
