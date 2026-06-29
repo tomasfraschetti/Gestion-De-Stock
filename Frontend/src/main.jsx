@@ -4,6 +4,10 @@ import './index.css'
 import { BrowserRouter } from "react-router-dom"
 import { StockProvider } from './context/StockContext.jsx'
 import App from './App.jsx'
+import { registerSW } from 'virtual:pwa-register'
+
+// Registrar Service Worker con auto-update
+registerSW({ immediate: true })
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
@@ -13,6 +17,4 @@ createRoot(document.getElementById('root')).render(
       </BrowserRouter>
     </StockProvider>
   </StrictMode>
-
-
 )
