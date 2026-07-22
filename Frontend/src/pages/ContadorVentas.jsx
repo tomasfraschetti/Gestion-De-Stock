@@ -55,8 +55,17 @@ function ContadorVentas() {
     const gruposEntregados = agruparPorCliente(entregados);
     const gruposPendientes = agruparPorCliente(pendientes);
 
-    const sumaPendientes = pendientes.reduce((a, p) => a + Number(p.cantidad), 0);
-    const sumaEntregados = entregados.reduce((a, p) => a + Number(p.cantidad), 0);
+    const porViandaPendientes = pendientes.reduce((acc, p) => {
+        const key = p.vianda || "Sin nombre";
+        acc[key] = (acc[key] || 0) + Number(p.cantidad);
+        return acc;
+    }, {});
+
+    const porViandaEntregados = entregados.reduce((acc, p) => {
+        const key = p.vianda || "Sin nombre";
+        acc[key] = (acc[key] || 0) + Number(p.cantidad);
+        return acc;
+    }, {});
 
     const procesarCierre = async () => {
         const agrupados = pedidos.reduce((acc, p) => {
@@ -105,23 +114,41 @@ function ContadorVentas() {
 
             {/* STATS */}
             <div className="grid grid-cols-2 gap-2">
-                {/* Pendientes */}
-                <div className="flex flex-col items-center justify-center p-4 bg-red-600/[0.06] border border-red-600 rounded-2xl shadow-sm text-center">
-                    <span className="text-[2.5rem] font-bold leading-none text-red-600">
-                        {sumaPendientes}
-                    </span>
-                    <span className="text-[0.65rem] font-bold uppercase tracking-widest mt-1 text-red-600">
+                {/* Pendientes por vianda */}
+                <div className="flex flex-col bg-red-600/[0.06] border border-red-600 rounded-2xl shadow-sm overflow-hidden">
+                    <span className="text-[0.6rem] font-bold uppercase tracking-widest text-red-600 px-3 pt-2 pb-1 border-b border-red-600/30">
                         Faltan
                     </span>
+                    <ul className="flex flex-col gap-0 overflow-y-auto max-h-[5.5rem] px-2 py-1">
+                        {Object.entries(porViandaPendientes).length === 0 ? (
+                            <li className="text-[0.7rem] text-red-400 italic py-1 px-1">—</li>
+                        ) : (
+                            Object.entries(porViandaPendientes).map(([vianda, total]) => (
+                                <li key={vianda} className="flex justify-between items-baseline py-[0.18rem]">
+                                    <span className="text-[0.7rem] text-red-700 truncate mr-1 leading-none">{vianda}</span>
+                                    <span className="text-[0.85rem] font-bold text-red-600 leading-none shrink-0">{total}</span>
+                                </li>
+                            ))
+                        )}
+                    </ul>
                 </div>
-                {/* Entregados */}
-                <div className="flex flex-col items-center justify-center p-4 bg-green-700/[0.06] border border-green-700 rounded-2xl shadow-sm text-center">
-                    <span className="text-[2.5rem] font-bold leading-none text-green-700">
-                        {sumaEntregados}
-                    </span>
-                    <span className="text-[0.65rem] font-bold uppercase tracking-widest mt-1 text-green-700">
+                {/* Entregados por vianda */}
+                <div className="flex flex-col bg-green-700/[0.06] border border-green-700 rounded-2xl shadow-sm overflow-hidden">
+                    <span className="text-[0.6rem] font-bold uppercase tracking-widest text-green-700 px-3 pt-2 pb-1 border-b border-green-700/30">
                         Listas
                     </span>
+                    <ul className="flex flex-col gap-0 overflow-y-auto max-h-[5.5rem] px-2 py-1">
+                        {Object.entries(porViandaEntregados).length === 0 ? (
+                            <li className="text-[0.7rem] text-green-400 italic py-1 px-1">—</li>
+                        ) : (
+                            Object.entries(porViandaEntregados).map(([vianda, total]) => (
+                                <li key={vianda} className="flex justify-between items-baseline py-[0.18rem]">
+                                    <span className="text-[0.7rem] text-green-800 truncate mr-1 leading-none">{vianda}</span>
+                                    <span className="text-[0.85rem] font-bold text-green-700 leading-none shrink-0">{total}</span>
+                                </li>
+                            ))
+                        )}
+                    </ul>
                 </div>
             </div>
 
