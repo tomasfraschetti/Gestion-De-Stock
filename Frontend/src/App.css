@@ -9,6 +9,12 @@
   min-height: 100svh;
 }
 
+@media (min-width: 1024px) {
+  #root {
+    max-width: 100%;
+  }
+}
+
 /* ── Patrón ajedrez decorativo (sin equivalente Tailwind) ─ */
 .chess-line {
   height: 6px;

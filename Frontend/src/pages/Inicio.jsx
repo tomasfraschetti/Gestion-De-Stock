@@ -108,7 +108,7 @@ function Inicio() {
     };
 
     return (
-        <main className="flex flex-col gap-4 px-4 pt-4 pb-24">
+        <main className="flex flex-col gap-4 px-4 pt-4 pb-24 lg:pb-8">
             {/* HEADER */}
             <header className="flex flex-col items-center gap-1 py-6">
                 <h1 className="font-serif text-4xl text-green-900 leading-tight">Julia Retamal</h1>
@@ -122,8 +122,9 @@ function Inicio() {
                 )}
             </header>
 
+            <div className="flex flex-col gap-4 lg:grid lg:grid-cols-[1fr_2fr] lg:gap-6 lg:items-start">
             {/* NUEVA VIANDA */}
-            <section className="bg-white border border-stone-200 rounded-2xl shadow-sm p-4">
+            <section className="bg-white border border-stone-200 rounded-2xl shadow-sm p-4 lg:sticky lg:top-20">
                 <h2 className="flex items-center gap-2 text-base font-bold text-green-900 mb-4">
                     <Plus size={18} color="currentColor" strokeWidth={2.2} />
                     Nueva Vianda
@@ -201,6 +202,7 @@ function Inicio() {
                     )}
                 </div>
             </section>
+            </div>
         </main>
     );
 }

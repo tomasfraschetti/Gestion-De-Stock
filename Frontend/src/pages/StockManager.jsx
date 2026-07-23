@@ -100,13 +100,15 @@ function StockManager() {
     const fieldCls = "flex flex-col gap-1 mb-4";
 
     return (
-        <main className="flex flex-col gap-4 px-4 pt-4 pb-24">
+        <main className="flex flex-col gap-4 px-4 pt-4 pb-24 lg:pb-8">
             <header className="flex flex-col items-center gap-1 py-6">
                 <h1 className="font-serif text-4xl text-green-900 leading-tight">Julia Retamal</h1>
                 <p className="text-gray-500 text-[0.85rem]">Anotar Pedido</p>
                 <div className="chess-line w-full mt-1" />
             </header>
 
+            <div className="flex flex-col gap-4 lg:grid lg:grid-cols-2 lg:gap-6 lg:items-start">
+            <div className="flex flex-col gap-4">
             {/* ── CLIENTE ───────────────────────────────────── */}
             <section className="bg-white border border-stone-200 rounded-2xl shadow-sm p-4">
                 <h2 className="flex items-center gap-2 text-base font-bold text-green-900 mb-4">
@@ -254,7 +256,9 @@ function StockManager() {
                     Agregar vianda
                 </button>
             </section>
+            </div>
 
+            <div className="flex flex-col gap-4 lg:sticky lg:top-20">
             {/* ── DETALLE ───────────────────────────────────── */}
             {items.length > 0 && (
                 <section className="bg-white border border-stone-200 rounded-2xl shadow-sm p-4">
@@ -287,6 +291,8 @@ function StockManager() {
                 <CheckCircle2 size={20} color="currentColor" strokeWidth={2} />
                 Finalizar Pedido
             </button>
+            </div>
+            </div>
         </main>
     );
 }

@@ -104,7 +104,7 @@ function ContadorVentas() {
     };
 
     return (
-        <main className="flex flex-col gap-4 px-4 pt-4 pb-24">
+        <main className="flex flex-col gap-4 px-4 pt-4 pb-24 lg:pb-8">
             {/* HEADER */}
             <header className="flex flex-col items-center gap-1 py-6">
                 <h1 className="font-serif text-4xl text-green-900 leading-tight">Julia Retamal</h1>
@@ -152,11 +152,13 @@ function ContadorVentas() {
                 </div>
             </div>
 
+            <div className="flex flex-col gap-4 lg:grid lg:grid-cols-2 lg:gap-6 lg:items-start">
             {/* PENDIENTES */}
             <SeccionPedidos titulo="PENDIENTES" grupos={gruposPendientes} done={false} />
 
             {/* ENTREGADOS */}
             <SeccionPedidos titulo="ENTREGADAS" grupos={gruposEntregados} done={true} />
+            </div>
 
             {/* CERRAR JORNADA */}
             <button

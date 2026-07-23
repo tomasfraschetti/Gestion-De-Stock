@@ -9,12 +9,14 @@ import 'react-toastify/dist/ReactToastify.css'
 
 function App() {
   return (
-    <div className="relative min-h-screen bg-stone-50">
-      <Routes>
-        <Route path='/' element={<Inicio />} />
-        <Route path='/StockManager' element={<StockManager />} />
-        <Route path='/Contador' element={<ContadorVentas />} />
-      </Routes>
+    <div className="relative min-h-screen bg-stone-50 lg:pt-14">
+      <div className="lg:max-w-6xl lg:mx-auto">
+        <Routes>
+          <Route path='/' element={<Inicio />} />
+          <Route path='/StockManager' element={<StockManager />} />
+          <Route path='/Contador' element={<ContadorVentas />} />
+        </Routes>
+      </div>
       <Navbar />
       <ToastContainer
         position="top-right"

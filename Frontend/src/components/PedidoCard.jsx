@@ -105,7 +105,7 @@ function PedidoCard({ grupo, done }) {
                     <span className="font-bold text-[0.95rem] text-gray-900 truncate">
                         {grupo.cliente}
                     </span>
-                    <span className="text-[0.78rem] text-gray-500 truncate max-w-[200px]">
+                    <span className="text-[0.78rem] text-gray-500 truncate max-w-[200px] lg:max-w-md">
                         {resumenViandas}
                     </span>
                 </div>
