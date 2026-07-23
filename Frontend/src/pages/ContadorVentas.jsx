@@ -76,7 +76,7 @@ function ContadorVentas() {
         }, {});
 
         try {
-            const res = await fetch("http://localhost:3000/api/pedidos/sincronizar", {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/pedidos/sincronizar`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(Object.values(agrupados)),
