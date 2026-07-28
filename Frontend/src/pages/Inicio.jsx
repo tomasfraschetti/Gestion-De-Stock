@@ -60,7 +60,7 @@ function Inicio() {
                             ${activa ? "" : "line-through"}`}
                         type="text"
                         value={vianda.nombre}
-                        onChange={e => editarVianda(vianda.id, "nombre", e.target.value)}
+                        onChange={e => editarVianda(vianda.id, "nombre", e.target.value.toUpperCase())}
                     />
                     <div className="flex items-center gap-1">
                         <span className="text-gray-500 text-[0.85rem]">$</span>
@@ -138,7 +138,7 @@ function Inicio() {
                             id="vNombre"
                             type="text"
                             value={nombre}
-                            onChange={e => setNombre(e.target.value)}
+                            onChange={e => setNombre(e.target.value.toUpperCase())}
                             placeholder="Ej. Pollo con puré"
                             required
                             className="bg-stone-50 border border-stone-200 rounded-xl text-gray-900 px-4 h-[52px] font-sans text-base w-full outline-none focus:border-green-900 focus:ring-2 focus:ring-green-900/10 transition-shadow"

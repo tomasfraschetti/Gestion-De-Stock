@@ -124,7 +124,7 @@ function StockManager() {
                             ref={inputRef}
                             type="text"
                             value={cliente}
-                            onChange={e => { setCliente(e.target.value); setMostrarSugerencias(true); }}
+                            onChange={e => { setCliente(e.target.value.toUpperCase()); setMostrarSugerencias(true); }}
                             onFocus={() => cliente.length > 0 && setMostrarSugerencias(true)}
                             placeholder="Ej. María García"
                             autoComplete="off"
@@ -192,7 +192,7 @@ function StockManager() {
                             id="domicilioInput"
                             type="text"
                             value={domicilio}
-                            onChange={e => setDomicilio(e.target.value)}
+                            onChange={e => setDomicilio(e.target.value.toUpperCase())}
                             placeholder="Ej. Calle 123"
                             className={inputCls}
                         />
